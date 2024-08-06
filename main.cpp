@@ -1,8 +1,8 @@
 #include <iostream>
+#include <array>
+#include <vector>
+#include <cmath>
 #include <SDL2/SDL.h>
-
-// DrawGrid(renderer, num_rows, num_cols);
-// DrawTile(x, y)
 
 namespace {
     constexpr int kGridWidth = 400;
@@ -10,32 +10,106 @@ namespace {
 
     constexpr int kWindowWidth = 640;
     constexpr int kWindowHeight = 480;
+
+    constexpr int num_tiles = 64;
 }
 
-void draw_grid(SDL_Renderer* renderer, int rows, int cols) {
-    int x = (kWindowWidth - kGridWidth)/2;
-    int y = (kWindowHeight - kGridHeight)/2;
+struct Marker {
+    int _r;
+    int _g;
+    int _b;
 
-    SDL_Rect rectangle {
-        x,              // x
-        y,              // y
-        kGridWidth,     // w
-        kGridHeight,    // h
-    };
+    int x;
+    int y;
+    int radius;
 
-    SDL_SetRenderDrawColor(renderer,1,50,32,SDL_ALPHA_OPAQUE);
-    SDL_RenderFillRect(renderer, &rectangle);
-
-    SDL_SetRenderDrawColor(renderer,255,255,255,SDL_ALPHA_OPAQUE);
-    float tile_width = kGridWidth / rows;
-    float tile_height = kGridHeight / cols;
-    for(int i = 1; i < rows; ++i) {
-        SDL_RenderDrawLine(renderer, x, y + i*tile_height, x+kGridWidth, y+i*tile_height);
+    void SetColor(int r, int g, int b) {
+        _r = r;
+        _g = g;
+        _b = b;
     }
-    for(int i = 1; i < cols; ++i) {
-        SDL_RenderDrawLine(renderer, x+i*tile_width, y, x+i*tile_width, y+kGridHeight);
+
+    void Render();
+};
+
+struct Tile {
+    int _x;
+    int _y;
+    int _w;
+    int _h;
+    Marker* marker{nullptr};
+
+    void Initialize(int x, int y, int w, int h) {
+        _x = x;
+        _y = y;
+        _w = w;
+        _h = h;
     }
-}
+
+    void Render(SDL_Renderer* renderer) {
+        SDL_Rect rectangle {
+            _x,
+            _y,
+            _w,
+            _h,
+        };
+        SDL_SetRenderDrawColor(renderer,0,0,0,SDL_ALPHA_OPAQUE);
+        SDL_RenderDrawRect(renderer, &rectangle);
+    }
+};
+
+struct Player {
+    std::vector<Tile> tiles{};
+    int score{0};
+};
+
+struct Game {
+    std::array<Tile, num_tiles> board;
+    Player p0;
+    Player p1;
+
+    void Initialize() {
+        int rows = std::sqrt(num_tiles);
+        int cols = std::sqrt(num_tiles);
+
+        int x = (kWindowWidth - kGridWidth)/2;
+        int y = (kWindowHeight - kGridHeight)/2;
+
+        int w = kGridWidth / rows;
+        int h = kGridHeight / cols;
+        
+        for(int i = 0; i < rows; ++i) {
+            for(int j = 0; j < cols; ++j) {
+                int index = i*cols + j;
+                board[index].Initialize(x + j*w, y + i*h, w, h);
+            }
+        }
+    }
+
+    // @param x: x coordinate of mouse button press
+    // @param y: y coordinate of mouse button press
+    void Update(int x, int y) {
+        std::cout << "x = " << x << ", y = " << y << std::endl;
+    }
+
+    void Render(SDL_Renderer* renderer) {
+        int x = (kWindowWidth - kGridWidth)/2;
+        int y = (kWindowHeight - kGridHeight)/2;
+
+        SDL_Rect rectangle {
+            x,
+            y,
+            kGridWidth,
+            kGridHeight,
+        };
+        SDL_SetRenderDrawColor(renderer,1,50,32,SDL_ALPHA_OPAQUE);
+        SDL_RenderFillRect(renderer, &rectangle);
+
+        for(int i = 0; i < num_tiles; ++i) {
+            board[i].Render(renderer);
+        }
+    }
+};
 
 int main() {
     if(SDL_Init(SDL_INIT_VIDEO) < 0){
@@ -51,6 +125,10 @@ int main() {
     SDL_Renderer* renderer = nullptr;
     renderer = SDL_CreateRenderer(window,-1,SDL_RENDERER_ACCELERATED);
 
+    // Initialize game
+    Game game;
+    game.Initialize();
+
     // Infinite loop for our application
     bool gameIsRunning = true;
     // Main application loop
@@ -64,6 +142,9 @@ int main() {
             if(event.type == SDL_QUIT){
                 gameIsRunning= false;
             }
+            if(event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
+                game.Update(event.button.x, event.button.y);
+            }
         }
         // (2) Handle Updates
         
@@ -72,8 +153,7 @@ int main() {
         SDL_SetRenderDrawColor(renderer,255,255,255,SDL_ALPHA_OPAQUE);
         SDL_RenderClear(renderer);
 
-        // Do our drawing
-        draw_grid(renderer, 8, 8);
+        game.Render(renderer);
 
         // Finally show what we've drawn
         SDL_RenderPresent(renderer);
