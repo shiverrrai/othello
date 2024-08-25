@@ -2,7 +2,17 @@
 #include <array>
 #include <vector>
 #include <cmath>
+#include <tuple>
+#include "circle.h"
 #include <SDL2/SDL.h>
+
+// Game objects:
+// Tile: includes position data on window along with marker that occupies it
+// Marker: composed of a color and x, y, r position/dimensions
+// Player: contains info about current score, the configured Marker color, and a vector of pointers to Tiles that the player owns
+// Game: manages current state of game, including initialization, rending, and updating objects
+
+// Coordinate system: x-axis is pointing right and y-axis is pointing down
 
 namespace {
     constexpr int kGridWidth = 400;
@@ -12,24 +22,75 @@ namespace {
     constexpr int kWindowHeight = 480;
 
     constexpr int num_tiles = 64;
+
+    const int rows = std::sqrt(num_tiles);
+    const int cols = std::sqrt(num_tiles);
+}
+
+enum class Color {
+    NONE,
+    BLACK,
+    WHITE,
+};
+
+bool IsOnBoard(int x, int y) {
+    // board boundaries
+    int upperLeftX = (kWindowWidth - kGridWidth)/2;
+    int upperLeftY = (kWindowHeight - kGridHeight)/2;
+    int bottomRightX = upperLeftX + kGridWidth;
+    int bottomRightY = upperLeftY + kGridHeight;
+
+    if (x < upperLeftX || x > bottomRightX) {
+        return false;
+    }
+    else if (y < upperLeftY || y > bottomRightY) {
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
+// convert a (x,y) position of a tile into a linear index
+int TileXYToIndex(int x, int y) {
+    return (y * cols + x);
+}
+
+// convert a linear index into (x,y) position of a tile
+std::tuple<int, int> IndexToTileXY(int index) {
+    int x = index % rows;
+    int y = index / rows;
+    return std::make_tuple(x, y);
 }
 
 struct Marker {
-    int _r;
-    int _g;
-    int _b;
+    int _x;
+    int _y;
+    int radius{10};
 
-    int x;
-    int y;
-    int radius;
+    std::array<int, 3> rgb{0,0,0};
 
-    void SetColor(int r, int g, int b) {
-        _r = r;
-        _g = g;
-        _b = b;
+    void SetColor(Color color) {
+        if (color == Color::BLACK) {
+            rgb = {0,0,0};
+        }
+        else if (color == Color::WHITE) {
+            rgb = {255,255,255};
+        }
+        else {
+            rgb = {1,50,32};
+        }
     }
 
-    void Render();
+    void SetPosition(int x, int y) {
+        _x = x;
+        _y = y;
+    }
+
+    void Render(SDL_Renderer* renderer) {
+        SDL_SetRenderDrawColor(renderer,rgb[0], rgb[1], rgb[2], SDL_ALPHA_OPAQUE);
+        SDL_RenderFillCircle(renderer, _x, _y, radius);
+    }
 };
 
 struct Tile {
@@ -37,13 +98,17 @@ struct Tile {
     int _y;
     int _w;
     int _h;
-    Marker* marker{nullptr};
+    Marker _marker;
 
     void Initialize(int x, int y, int w, int h) {
         _x = x;
         _y = y;
         _w = w;
         _h = h;
+        
+        // Initialize tile with empty marker
+        _marker.SetColor(Color::NONE);
+        _marker.SetPosition(_x+w/2.0, _y+_h/2.0);
     }
 
     void Render(SDL_Renderer* renderer) {
@@ -53,25 +118,49 @@ struct Tile {
             _w,
             _h,
         };
-        SDL_SetRenderDrawColor(renderer,0,0,0,SDL_ALPHA_OPAQUE);
+        SDL_SetRenderDrawColor(renderer,255,255,255,SDL_ALPHA_OPAQUE);
         SDL_RenderDrawRect(renderer, &rectangle);
+        _marker.Render(renderer);
     }
 };
 
 struct Player {
-    std::vector<Tile> tiles{};
+    std::vector<Tile*> tiles{};
     int score{0};
+
+    void Initialize(std::array<Tile, num_tiles>& board, Color color) {
+        score = 2;
+        int index = 0;
+        if (color == Color::BLACK) {
+            index = TileXYToIndex(4, 3);
+            tiles.push_back(&board[index]);
+            index = TileXYToIndex(3,4);
+            tiles.push_back(&board[index]);
+            tiles[0]->_marker.SetColor(color);
+            tiles[1]->_marker.SetColor(color);
+        }
+        else if (color == Color::WHITE) {
+            index = TileXYToIndex(3, 3);
+            tiles.push_back(&board[index]);
+            index = TileXYToIndex(4,4);
+            tiles.push_back(&board[index]);
+            tiles[0]->_marker.SetColor(color);
+            tiles[1]->_marker.SetColor(color);
+        }
+    }
+
+    // checks if a given input tile is a valid move
+    // sets marker color of this tile
+    // updates surrounding neighbors to player color
+    // updates score
+    void MakeMove();
 };
 
 struct Game {
-    std::array<Tile, num_tiles> board;
-    Player p0;
-    Player p1;
+    std::array<Tile, num_tiles> _board;
+    Player _p;
 
     void Initialize() {
-        int rows = std::sqrt(num_tiles);
-        int cols = std::sqrt(num_tiles);
-
         int x = (kWindowWidth - kGridWidth)/2;
         int y = (kWindowHeight - kGridHeight)/2;
 
@@ -81,15 +170,39 @@ struct Game {
         for(int i = 0; i < rows; ++i) {
             for(int j = 0; j < cols; ++j) {
                 int index = i*cols + j;
-                board[index].Initialize(x + j*w, y + i*h, w, h);
+                _board[index].Initialize(x + j*w, y + i*h, w, h);
             }
         }
+    }
+
+    // Convert a pixel coordinate (x, y) into an (x, y) position of a tile
+    // If pixel coordinate does not fall on any tile, return (-1, -1)
+    std::tuple<int, int> WindowXYToTileXY(int x, int y) {
+        int tileX{0};
+        int tileY{0};
+        if(!IsOnBoard(x, y)) {
+            tileX = -1, tileY = -1;
+            return std::make_tuple(tileX, tileY);
+        }
+        int upperLeftX = (kWindowWidth - kGridWidth)/2;
+        int upperLeftY = (kWindowHeight - kGridHeight)/2;
+        int shiftedX = x - upperLeftX;
+        int shiftedY = y - upperLeftY;
+        int tileW = kGridWidth / rows;
+        int tileH = kGridHeight / cols;
+
+        tileX = shiftedX / tileH;
+        tileY = shiftedY / tileW;
+        return std::make_tuple(tileX, tileY);
     }
 
     // @param x: x coordinate of mouse button press
     // @param y: y coordinate of mouse button press
     void Update(int x, int y) {
         std::cout << "x = " << x << ", y = " << y << std::endl;
+        std::cout << "IsOnBoard = " << IsOnBoard(x, y) << std::endl;
+        auto [tileX, tileY] = WindowXYToTileXY(x, y);
+        std::cout << "tileX = " << tileX << ", tileY = " << tileY << std::endl;
     }
 
     void Render(SDL_Renderer* renderer) {
@@ -106,7 +219,7 @@ struct Game {
         SDL_RenderFillRect(renderer, &rectangle);
 
         for(int i = 0; i < num_tiles; ++i) {
-            board[i].Render(renderer);
+            _board[i].Render(renderer);
         }
     }
 };
@@ -128,6 +241,12 @@ int main() {
     // Initialize game
     Game game;
     game.Initialize();
+
+    Player p1;
+    p1.Initialize(game._board, Color::BLACK);
+
+    Player p2;
+    p2.Initialize(game._board, Color::WHITE);
 
     // Infinite loop for our application
     bool gameIsRunning = true;
