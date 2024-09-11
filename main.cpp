@@ -67,6 +67,7 @@ struct Marker {
     int _x;
     int _y;
     int radius{10};
+    Color _color{Color::NONE};
 
     std::array<int, 3> rgb{0,0,0};
 
@@ -80,6 +81,11 @@ struct Marker {
         else {
             rgb = {1,50,32};
         }
+        _color = color;
+    }
+
+    Color GetColor() {
+        return _color;
     }
 
     void SetPosition(int x, int y) {
@@ -118,7 +124,7 @@ struct Tile {
             _w,
             _h,
         };
-        SDL_SetRenderDrawColor(renderer,255,255,255,SDL_ALPHA_OPAQUE);
+        SDL_SetRenderDrawColor(renderer,0,0,0,SDL_ALPHA_OPAQUE);
         SDL_RenderDrawRect(renderer, &rectangle);
         _marker.Render(renderer);
     }
@@ -127,9 +133,11 @@ struct Tile {
 struct Player {
     std::vector<Tile*> tiles{};
     int score{0};
+    Color _color{Color::NONE};
 
     void Initialize(std::array<Tile, num_tiles>& board, Color color) {
         score = 2;
+        _color = color;
         int index = 0;
         if (color == Color::BLACK) {
             index = TileXYToIndex(4, 3);
@@ -149,16 +157,56 @@ struct Player {
         }
     }
 
+    bool IsValidMove(std::array<Tile, num_tiles>& board, int x, int y) {
+        int index = TileXYToIndex(x, y);
+        Color tile_color = board[index]._marker.GetColor();
+        if(tile_color != Color::NONE) {
+            return false;
+        }
+        return true;
+    }
+
     // checks if a given input tile is a valid move
     // sets marker color of this tile
     // updates surrounding neighbors to player color
     // updates score
-    void MakeMove();
+    // (x,y) are tile coordinates of where to place marker
+    // returns true if move was made successfully, false otherwise
+    bool MakeMove(std::array<Tile, num_tiles>& board, int x, int y) {
+        bool is_valid = IsValidMove(board, x, y);
+        
+        if(is_valid) {
+            int index = TileXYToIndex(x, y);
+            tiles.push_back(&board[index]);
+            tiles.back()->_marker.SetColor(_color);
+        }
+        return is_valid;
+    }
+
+    void PrintTiles() {
+        std::cout << "Printing tiles" << std::endl;
+        for(int i = 0; i < tiles.size(); i++) {
+            std::cout << "Tile " << i << ": " << tiles[i] << std::endl;
+        }
+    }
+
+    void Reset(std::array<Tile, num_tiles>& board) {
+        for(int i = 0; i < tiles.size(); i++) {
+            tiles[i]->_marker.SetColor(Color::NONE);
+        }
+        tiles.clear();
+        Initialize(board, _color);
+        
+    }
 };
 
 struct Game {
     std::array<Tile, num_tiles> _board;
-    Player _p;
+    Player _p1;
+    Player _p2;
+    int player_index{0};
+    std::array<Player, 2> players;
+
 
     void Initialize() {
         int x = (kWindowWidth - kGridWidth)/2;
@@ -173,6 +221,8 @@ struct Game {
                 _board[index].Initialize(x + j*w, y + i*h, w, h);
             }
         }
+        players[0].Initialize(_board, Color::BLACK);
+        players[1].Initialize(_board, Color::WHITE);
     }
 
     // Convert a pixel coordinate (x, y) into an (x, y) position of a tile
@@ -203,6 +253,20 @@ struct Game {
         std::cout << "IsOnBoard = " << IsOnBoard(x, y) << std::endl;
         auto [tileX, tileY] = WindowXYToTileXY(x, y);
         std::cout << "tileX = " << tileX << ", tileY = " << tileY << std::endl;
+        if(IsOnBoard(x, y)) {
+            bool result = players[player_index].MakeMove(_board, tileX, tileY);
+            if (result) {
+                player_index = (player_index + 1) % 2;
+            }
+        }
+        players[0].PrintTiles();
+        players[1].PrintTiles();
+    }
+
+    void ClearBoard() {
+        std::cout << "Clearing board!" << std::endl;
+        players[0].Reset(_board);
+        players[1].Reset(_board);
     }
 
     void Render(SDL_Renderer* renderer) {
@@ -242,11 +306,11 @@ int main() {
     Game game;
     game.Initialize();
 
-    Player p1;
-    p1.Initialize(game._board, Color::BLACK);
+    // Player p1;
+    // p1.Initialize(game._board, Color::BLACK);
 
-    Player p2;
-    p2.Initialize(game._board, Color::WHITE);
+    // Player p2;
+    // p2.Initialize(game._board, Color::WHITE);
 
     // Infinite loop for our application
     bool gameIsRunning = true;
@@ -263,6 +327,9 @@ int main() {
             }
             if(event.type == SDL_MOUSEBUTTONDOWN && event.button.button == SDL_BUTTON_LEFT) {
                 game.Update(event.button.x, event.button.y);
+            }
+            if(event.type == SDL_KEYDOWN && event.key.keysym.scancode == SDL_SCANCODE_C) {
+                game.ClearBoard();
             }
         }
         // (2) Handle Updates
