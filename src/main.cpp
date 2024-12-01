@@ -3,7 +3,7 @@
 #include <vector>
 #include <cmath>
 #include <tuple>
-#include "circle.h"
+#include "utils/circle.h"
 #include <SDL2/SDL.h>
 
 // Game objects:
