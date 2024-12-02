@@ -9,7 +9,7 @@ class Input {
 
         void update();
 
-        inline bool is_window_closed() {
+        inline bool is_window_closed() const {
             return quit_;
         }
 

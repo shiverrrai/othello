@@ -1,7 +1,25 @@
 #include "board.h"
 
-Board::Board(Point origin, int length) : 
-    origin_(origin), length_(length) {}
+void Board::initialize(const Point& origin, int length) {
+    origin_ = origin;
+    length_ = length;
+    initialize_tiles();
+}
+
+void Board::initialize_tiles() {
+    int w = length_ / internal::kRows;
+    int h = length_ / internal::kCols;
+
+    for(int i = 0; i < internal::kRows; ++i) {
+        for(int j = 0; j < internal::kCols; ++j) {
+            int index = i*internal::kCols + j;
+            tiles_[index].initialize(
+                Point{origin_.x_ + j*w, origin_.y_ + i*h}, 
+                length_ / internal::kRows);
+        }
+    }
+
+}
 
 void Board::render(SDL_Renderer* renderer) {
     SDL_Rect rectangle {
@@ -12,12 +30,9 @@ void Board::render(SDL_Renderer* renderer) {
     };
     SDL_SetRenderDrawColor(renderer,1,50,32,SDL_ALPHA_OPAQUE);
     SDL_RenderFillRect(renderer, &rectangle);
+
+    for(int i = 0; i < internal::kNumTiles; ++i) {
+        tiles_[i].render(renderer);
+    }
 }
 
-void Board::set_origin(const Point& origin) {
-    origin_ = origin;
-}
-
-void Board::set_length(int length) {
-    length_ = length;
-}

@@ -22,7 +22,7 @@ class Screen {
         void initialize_board();
 
         const char* title_;
-        const int width_, height_;
+        int width_, height_;
 };
 
 #endif // SRC_GRAPHICS_SCREEN_H

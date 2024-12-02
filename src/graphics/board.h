@@ -2,24 +2,36 @@
 #define SRC_GRAPHICS_BOARD_H
 
 #include <SDL2/SDL.h>
+#include <array>
+#include <cmath>
 #include "point.h"
+#include "tile.h"
+
+namespace internal {
+    constexpr int kNumTiles = 64;
+
+    const int kRows = std::sqrt(kNumTiles);
+    const int kCols = std::sqrt(kNumTiles);
+}
 
 class Board {
     public:
         Board() = default;
-        Board(Point origin, int length);
+
+        void initialize(const Point& origin, int length);
 
         void update();
 
         void render(SDL_Renderer* renderer);
 
-        void set_origin(const Point& origin);
-
-        void set_length(int length);
+        
     
     private:
         Point origin_{};
 
+        void initialize_tiles();
+
+        std::array<Tile, internal::kNumTiles> tiles_{};
         int length_{};
 };
 

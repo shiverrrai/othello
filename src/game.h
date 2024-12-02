@@ -11,7 +11,7 @@ class Game {
         void update();
         void render();
 
-        bool is_running();
+        bool is_running() const;
     
     private:
         Input input_{};

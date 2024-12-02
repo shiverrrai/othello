@@ -12,6 +12,6 @@ void Game::render() {
     screen_.render();
 }
 
-bool Game::is_running() {
+bool Game::is_running() const {
     return !input_.is_window_closed();
 }

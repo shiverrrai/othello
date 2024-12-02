@@ -32,7 +32,7 @@ Screen::~Screen() {
 
 void Screen::initialize_board() {
     // compute board length
-    const double aspect_ratio = 0.6;
+    const double aspect_ratio = 0.7;
     const int length = static_cast<int>(std::min(width_, height_) * aspect_ratio);
     
     // compute board origin
@@ -40,8 +40,7 @@ void Screen::initialize_board() {
     const int y = (height_ - length) / 2;
 
     // initialize board
-    board_.set_length(length);
-    board_.set_origin(Point{x, y});
+    board_.initialize(Point{x, y}, length);
 }
 
 void Screen::clear() {

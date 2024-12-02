@@ -4,6 +4,7 @@ find_package(SDL2 REQUIRED)
 add_library(Graphics STATIC 
     screen.cpp
     board.cpp
+    tile.cpp
 )
 
 # Link SDL2 and propagate include directories
