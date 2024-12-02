@@ -1,3 +1,6 @@
+#ifndef SRC_UTILS_INPUT_H
+#define SRC_UTILS_INPUT_H
+
 #include <SDL2/SDL.h>
 
 class Input {
@@ -16,3 +19,5 @@ class Input {
         bool quit_{false};
     
 };
+
+#endif // SRC_UTILS_INPUT_H

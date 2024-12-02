@@ -1,9 +1,12 @@
 #include "screen.h"
 
 #include <iostream>
+#include <algorithm>
+#include "point.h"
 
 Screen::Screen(const char* title, int width, int height) :
     title_(title), width_(width), height_(height) {
+    
     window_ = SDL_CreateWindow(
         title_,
         SDL_WINDOWPOS_CENTERED,
@@ -18,11 +21,27 @@ Screen::Screen(const char* title, int width, int height) :
     }
 
     renderer_ = SDL_CreateRenderer(window_,-1,SDL_RENDERER_ACCELERATED);
+
+    initialize_board();
 }
 
 Screen::~Screen() {
     SDL_DestroyWindow(window_);
     SDL_Quit();
+}
+
+void Screen::initialize_board() {
+    // compute board length
+    const double aspect_ratio = 0.6;
+    const int length = static_cast<int>(std::min(width_, height_) * aspect_ratio);
+    
+    // compute board origin
+    const int x = (width_ - length) / 2;
+    const int y = (height_ - length) / 2;
+
+    // initialize board
+    board_.set_length(length);
+    board_.set_origin(Point{x, y});
 }
 
 void Screen::clear() {
@@ -31,5 +50,6 @@ void Screen::clear() {
 }
 
 void Screen::render() {
+    board_.render(renderer_);
     SDL_RenderPresent(renderer_);
 }

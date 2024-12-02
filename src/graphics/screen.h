@@ -1,4 +1,8 @@
+#ifndef SRC_GRAPHICS_SCREEN_H
+#define SRC_GRAPHICS_SCREEN_H
+
 #include <SDL2/SDL.h>
+#include "board.h"
 
 class Screen {
     public:
@@ -11,8 +15,14 @@ class Screen {
         void render();
 
     private:
-        const char* title_;
-        const int width_, height_;
         SDL_Window* window_{nullptr};
         SDL_Renderer* renderer_{nullptr};
+        Board board_{};
+
+        void initialize_board();
+
+        const char* title_;
+        const int width_, height_;
 };
+
+#endif // SRC_GRAPHICS_SCREEN_H
