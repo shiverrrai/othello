@@ -1,0 +1,1 @@
+Checkout https://github.com/TheCherno/ChernoCraft/blob/master/src/graphics/screen.cpp as an example project
