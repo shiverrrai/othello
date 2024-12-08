@@ -4,8 +4,8 @@
 #include <algorithm>
 #include "point.h"
 
-Screen::Screen(const char* title, int width, int height) :
-    title_(title), width_(width), height_(height) {
+Screen::Screen(const char* title, int width, int height, Board& board) :
+    title_(title), width_(width), height_(height), board_(board) {
     
     window_ = SDL_CreateWindow(
         title_,

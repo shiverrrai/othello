@@ -14,6 +14,9 @@ namespace internal {
     const int kCols = std::sqrt(kNumTiles);
 }
 
+/// @class Board is a dynamic grid that the user can interact with
+/// through mouse presses or specific key strokes
+/// A Board object is composed of an 8x8 grid of Tile objects
 class Board {
     public:
         Board() = default;
@@ -24,8 +27,6 @@ class Board {
 
         void render(SDL_Renderer* renderer);
 
-        
-    
     private:
         Point origin_{};
 

@@ -4,9 +4,10 @@
 #include <SDL2/SDL.h>
 #include "board.h"
 
+/// @class Screen class manages windowing and screen graphics
 class Screen {
     public:
-        Screen(const char* title, int width, int height);
+        Screen(const char* title, int width, int height, Board& board);
 
         ~Screen();
 
@@ -17,7 +18,7 @@ class Screen {
     private:
         SDL_Window* window_{nullptr};
         SDL_Renderer* renderer_{nullptr};
-        Board board_{};
+        Board& board_;
 
         void initialize_board();
 

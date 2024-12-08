@@ -1,7 +1,7 @@
 #include "game.h"
 
 Game::Game(const char* title, int width, int height) :
-    screen_(title, width, height) {}
+    screen_(title, width, height, board_) {}
 
 void Game::update() {
     input_.update();

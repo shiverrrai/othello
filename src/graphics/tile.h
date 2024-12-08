@@ -4,6 +4,9 @@
 #include <SDL2/SDL.h>
 #include "point.h"
 
+/// @class Tile class represents the individual element of a Board
+/// that can be accumulated by a Player instance. Each Tile contains 
+/// a marker of a specific color, depending on which player owns the Tile
 class Tile {
     public:
         Tile() = default;
