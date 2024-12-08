@@ -5,6 +5,8 @@ Game::Game(const char* title, int width, int height) :
 
 void Game::update() {
     input_.update();
+    int mouse_press_x, mouse_press_y;
+    input_.get_mouse_press(mouse_press_x, mouse_press_y);
 }
 
 void Game::render() {

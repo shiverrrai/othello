@@ -1,4 +1,5 @@
 #include "tile.h"
+#include "circle.h"
 
 void Tile::initialize(const Point& origin, int length) {
     origin_ = origin;
@@ -14,4 +15,23 @@ void Tile::render(SDL_Renderer* renderer) {
     };
     SDL_SetRenderDrawColor(renderer,0,0,0,SDL_ALPHA_OPAQUE);
     SDL_RenderDrawRect(renderer, &rectangle);
+    switch (color_)
+    {
+    case Color::NONE:
+        SDL_SetRenderDrawColor(renderer,1,50,32,SDL_ALPHA_OPAQUE);
+        break;
+    case Color::BLACK:
+        SDL_SetRenderDrawColor(renderer,0,0,0,SDL_ALPHA_OPAQUE);
+        break;
+    case Color::WHITE:
+        SDL_SetRenderDrawColor(renderer,255,255,255,SDL_ALPHA_OPAQUE);
+    default:
+        break;
+    }
+    double radius = 0.6*(length_/2.0);
+    SDL_RenderFillCircle(renderer, origin_.x_ + length_/2.0, origin_.y_ + length_/2.0, radius);
+}
+
+void Tile::set_color(Color color) {
+    color_ = color;
 }

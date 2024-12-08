@@ -5,6 +5,7 @@ add_library(Graphics STATIC
     screen.cpp
     board.cpp
     tile.cpp
+    circle.cpp
 )
 
 # Link SDL2 and propagate include directories

@@ -17,10 +17,15 @@ class Input {
             return quit_;
         }
 
+        bool get_mouse_press(int& mouse_press_x, int& mouse_press_y);
+
     private:
         SDL_Event event_;
 
+        int mouse_press_x_, mouse_press_y_;
+
         bool quit_{false};
+        bool is_mouse_pressed_{false};
     
 };
 
