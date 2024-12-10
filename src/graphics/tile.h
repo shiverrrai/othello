@@ -3,12 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include "point.h"
-
-enum class Color {
-    NONE,
-    BLACK,
-    WHITE
-};
+#include "utils/constants.h"
 
 /// @class Tile class represents the individual element of a Board
 /// that can be accumulated by a Player instance. Each Tile contains 
@@ -22,14 +17,14 @@ class Tile {
         void render(SDL_Renderer* renderer);
 
         /// @brief updates Tile's marker color
-        void set_color(Color color);
+        void set_color(constants::Color color);
 
     private:
         Point origin_{};
 
         int length_{};
 
-        Color color_{Color::NONE};
+        constants::Color color_{constants::Color::NONE};
 
 };
 

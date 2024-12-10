@@ -9,8 +9,14 @@ add_library(Graphics STATIC
 )
 
 # Link SDL2 and propagate include directories
-target_include_directories(Graphics PUBLIC ${SDL2_INCLUDE_DIRS})
-target_link_libraries(Graphics PUBLIC ${SDL2_LIBRARIES})
+target_include_directories(Graphics PUBLIC 
+    ${SDL2_INCLUDE_DIRS}
+    ${CMAKE_SOURCE_DIR}/src
+)
+
+target_link_libraries(Graphics PUBLIC 
+    ${SDL2_LIBRARIES}
+)
 
 
 

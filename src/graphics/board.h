@@ -3,16 +3,9 @@
 
 #include <SDL2/SDL.h>
 #include <array>
-#include <cmath>
 #include "point.h"
 #include "tile.h"
-
-namespace internal {
-    constexpr int kNumTiles = 64;
-
-    const int kRows = std::sqrt(kNumTiles);
-    const int kCols = std::sqrt(kNumTiles);
-}
+#include "utils/constants.h"
 
 /// @class Board is a dynamic grid that the user can interact with
 /// through mouse presses or specific key strokes
@@ -26,13 +19,20 @@ class Board {
         void update();
 
         void render(SDL_Renderer* renderer);
+        
+        static Point index_to_point(int index);
+
+        static int point_to_index(const Point& point);
+
+        Point origin() { return origin_; }
+        int length() { return length_; }
 
     private:
         Point origin_{};
 
         void initialize_tiles();
 
-        std::array<Tile, internal::kNumTiles> tiles_{};
+        std::array<Tile, constants::kNumTiles> tiles_{};
         int length_{};
 };
 

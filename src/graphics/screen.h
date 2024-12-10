@@ -15,6 +15,13 @@ class Screen {
 
         void render();
 
+        /// @brief determines whether an input (x,y) is on board
+        /// @param x x-coordinate of input
+        /// @param y y-coordinate of input
+        /// @return bool depending on whether input (x,y)
+        /// is on board
+        bool on_board(int x, int y);
+
     private:
         SDL_Window* window_{nullptr};
         SDL_Renderer* renderer_{nullptr};

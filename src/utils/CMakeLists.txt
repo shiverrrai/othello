@@ -6,5 +6,10 @@ add_library(Utils STATIC
 )
 
 # Link SDL2 and propagate include directories
-target_include_directories(Utils PUBLIC ${SDL2_INCLUDE_DIRS})
-target_link_libraries(Utils PUBLIC ${SDL2_LIBRARIES})
+target_include_directories(Utils PUBLIC 
+    ${SDL2_INCLUDE_DIRS}
+)
+
+target_link_libraries(Utils PUBLIC 
+    ${SDL2_LIBRARIES}
+)

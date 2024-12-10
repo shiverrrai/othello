@@ -3,8 +3,9 @@
 
 #include "graphics/screen.h"
 #include "utils/input.h"
+#include "entities/player.h"
 
-/// @class Game class holds on components of game along 
+/// @class Game class holds all components of game along 
 /// with functions to render and update the state of the game 
 class Game {
     public:
@@ -24,6 +25,8 @@ class Game {
         Board board_{};
         Input input_{};
         Screen screen_;
+        Player player1_;
+        Player player2_;
 };
 
 #endif // SRC_GAME_H

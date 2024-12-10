@@ -17,13 +17,13 @@ void Tile::render(SDL_Renderer* renderer) {
     SDL_RenderDrawRect(renderer, &rectangle);
     switch (color_)
     {
-    case Color::NONE:
+    case constants::Color::NONE:
         SDL_SetRenderDrawColor(renderer,1,50,32,SDL_ALPHA_OPAQUE);
         break;
-    case Color::BLACK:
+    case constants::Color::BLACK:
         SDL_SetRenderDrawColor(renderer,0,0,0,SDL_ALPHA_OPAQUE);
         break;
-    case Color::WHITE:
+    case constants::Color::WHITE:
         SDL_SetRenderDrawColor(renderer,255,255,255,SDL_ALPHA_OPAQUE);
     default:
         break;
@@ -32,6 +32,6 @@ void Tile::render(SDL_Renderer* renderer) {
     SDL_RenderFillCircle(renderer, origin_.x_ + length_/2.0, origin_.y_ + length_/2.0, radius);
 }
 
-void Tile::set_color(Color color) {
+void Tile::set_color(constants::Color color) {
     color_ = color;
 }
