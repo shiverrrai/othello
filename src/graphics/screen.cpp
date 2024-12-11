@@ -52,20 +52,3 @@ void Screen::render() {
     board_.render(renderer_);
     SDL_RenderPresent(renderer_);
 }
-
-bool Screen::on_board(int x, int y) {
-    // board boundaries
-    Point upper_left = board_.origin();
-    Point bottom_right{upper_left.x_ + board_.length(), 
-        upper_left.y_ + board_.length() };
-
-    if (x < upper_left.x_ || x > bottom_right.x_) {
-        return false;
-    }
-    else if (y < upper_left.y_ || y > bottom_right.y_) {
-        return false;
-    }
-    else {
-        return true;
-    }
-}

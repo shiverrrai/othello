@@ -19,6 +19,8 @@ class Tile {
         /// @brief updates Tile's marker color
         void set_color(constants::Color color);
 
+        constants::Color get_color() { return color_; }
+
     private:
         Point origin_{};
 

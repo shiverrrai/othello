@@ -20,10 +20,10 @@ void Board::initialize_tiles() {
     }
 
     // place initial tiles to start game
-    tiles_[point_to_index(Point{3, 3})].set_color(constants::Color::BLACK);
-    tiles_[point_to_index(Point{4, 4})].set_color(constants::Color::BLACK);
-    tiles_[point_to_index(Point{4, 3})].set_color(constants::Color::WHITE);
-    tiles_[point_to_index(Point{3, 4})].set_color(constants::Color::WHITE);
+    tiles_[tile_to_index(Point{3, 3})].set_color(constants::Color::BLACK);
+    tiles_[tile_to_index(Point{4, 4})].set_color(constants::Color::BLACK);
+    tiles_[tile_to_index(Point{4, 3})].set_color(constants::Color::WHITE);
+    tiles_[tile_to_index(Point{3, 4})].set_color(constants::Color::WHITE);
 }
 
 void Board::render(SDL_Renderer* renderer) {
@@ -41,13 +41,46 @@ void Board::render(SDL_Renderer* renderer) {
     }
 }
 
-Point Board::index_to_point(int index) {
+bool Board::on_board(int x, int y) {
+    // board boundaries
+    Point bottom_right{origin_.x_ + length_, 
+        origin_.y_ + length_ };
+
+    if (x < origin_.x_ || x > bottom_right.x_) {
+        return false;
+    }
+    else if (y < origin_.y_ || y > bottom_right.y_) {
+        return false;
+    }
+    else {
+        return true;
+    }
+}
+
+Tile& Board::get_tile(int row, int col) {
+    return tiles_[tile_to_index(Point{row, col})];
+}
+
+Point Board::index_to_tile(int index) {
     int x = index % constants::kRows;
     int y = index / constants::kRows;
     return Point{x, y};
 }
 
-int Board::point_to_index(const Point& point) {
-    return (point.y_ * constants::kCols + point.x_);
+int Board::tile_to_index(const Point& tile) {
+    return (tile.y_ * constants::kCols + tile.x_);
+}
+
+Point Board::xy_to_tile(int x, int y) {
+    if(!on_board(x, y)) {
+        return {-1, -1};
+    }
+    int x_board = x - origin_.x_;
+    int y_board = y - origin_.y_;
+    int tile_width = length_ / constants::kRows;
+    int tile_height = length_ / constants::kCols;
+
+    Point tile{x_board / tile_width, y_board / tile_height};
+    return tile;
 }
 

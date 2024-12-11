@@ -12,9 +12,7 @@ public:
     /// user input
     /// @return bool based on whether or not the move was 
     /// executed
-    bool make_move(int x, int y) { 
-        return true; 
-    }
+    bool make_move(int x, int y);
 
     inline void switch_turn() {
         is_active_ = !is_active_;
@@ -31,6 +29,9 @@ public:
 private:
     Board& board_;
     constants::Color color_;
+
+    bool is_valid(int row, int col);
+
     bool is_active_{false};
 };
 

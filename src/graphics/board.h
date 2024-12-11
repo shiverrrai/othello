@@ -20,12 +20,25 @@ class Board {
 
         void render(SDL_Renderer* renderer);
         
-        static Point index_to_point(int index);
+        static Point index_to_tile(int index);
 
-        static int point_to_index(const Point& point);
+        static int tile_to_index(const Point& tile);
 
-        Point origin() { return origin_; }
-        int length() { return length_; }
+        /// @brief given (x,y) in screen frame, compute (row,col) 
+        /// of Tile on board
+        /// @param x x coordinate in screen frame
+        /// @param y y coordinate in screen frame
+        /// @return Point (row, col) of Tile on board
+        Point xy_to_tile(int x, int y);
+
+        /// @brief determines whether an input (x,y) is on board
+        /// @param x x-coordinate of input
+        /// @param y y-coordinate of input
+        /// @return bool depending on whether input (x,y)
+        /// is on board
+        bool on_board(int x, int y);
+
+        Tile& get_tile(int row, int col);
 
     private:
         Point origin_{};
