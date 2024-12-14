@@ -7,8 +7,8 @@ void Board::initialize(const Point& origin, int length) {
 }
 
 void Board::initialize_tiles() {
-    int w = length_ / constants::kRows;
-    int h = length_ / constants::kCols;
+    int w = length_ / constants::kCols;
+    int h = length_ / constants::kRows;
 
     for(int i = 0; i < constants::kRows; ++i) {
         for(int j = 0; j < constants::kCols; ++j) {
@@ -77,10 +77,13 @@ Point Board::xy_to_tile(int x, int y) {
     }
     int x_board = x - origin_.x_;
     int y_board = y - origin_.y_;
-    int tile_width = length_ / constants::kRows;
-    int tile_height = length_ / constants::kCols;
+    int tile_width = length_ / constants::kCols;
+    int tile_height = length_ / constants::kRows;
 
     Point tile{x_board / tile_width, y_board / tile_height};
     return tile;
 }
 
+bool Board::in_bounds(int row, int col) {
+    return (row >= 0 && row < constants::kRows && col >= 0 && col < constants::kCols);
+}

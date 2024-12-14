@@ -35,3 +35,7 @@ void Tile::render(SDL_Renderer* renderer) {
 void Tile::set_color(constants::Color color) {
     color_ = color;
 }
+
+bool Tile::is_empty() {
+    return color_ == constants::Color::NONE;
+}

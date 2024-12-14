@@ -5,6 +5,7 @@
 #include "board.h"
 
 /// @class Screen class manages windowing and screen graphics
+/// x-axis is pointing to the right and y-axis is pointing down
 class Screen {
     public:
         Screen(const char* title, int width, int height, Board& board);

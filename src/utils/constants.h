@@ -1,13 +1,11 @@
 #ifndef SRC_UTILS_CONSTANTS_H
 #define SRC_UTILS_CONSTANTS_H
 
-#include <cmath>
-
 namespace constants {
 
 constexpr int kNumTiles = 64;
-const int kRows = std::sqrt(kNumTiles);
-const int kCols = std::sqrt(kNumTiles);
+constexpr int kRows = 8;
+constexpr int kCols = 8;
 
 enum class Color {
     NONE,

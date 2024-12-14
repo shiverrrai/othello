@@ -40,6 +40,8 @@ class Board {
 
         Tile& get_tile(int row, int col);
 
+        bool in_bounds(int row, int col);
+
     private:
         Point origin_{};
 
