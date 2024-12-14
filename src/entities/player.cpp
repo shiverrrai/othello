@@ -4,17 +4,20 @@
 
 namespace {
 
-std::array<Point, constants::kRows> kDirections{
+std::array<std::pair<int,int>, constants::kRows> kDirections{
     {{-1,-1}, {0,-1}, {1,-1}, {-1, 0}, 
     {1, 0}, {-1, 1}, {0, 1}, {1, 1}}
 };
 
-void print_directions(std::vector<Point>& directions) {
+void print_directions(std::vector<std::pair<int,int>>& directions) {
     for (auto direction : directions) {
-        std::cout << "{" << direction.x_ << ", " << direction.y_ << "}" << std::endl;
+        std::cout << "{" << direction.first << ", " << direction.second << "}" << std::endl;
     }
 }
 
+void print_grid_location(std::pair<int,int>& grid_location){
+    std::cout << "(" << grid_location.first << ", " << grid_location.second << ")" << std::endl;
+}
 }
 
 Player::Player(Board& board, constants::Color color) :
@@ -24,30 +27,38 @@ Player::Player(Board& board, constants::Color color) :
 }
 
 bool Player::make_move(int x, int y) {
-    if(board_.on_board(x, y)) {
-        Point tile = board_.xy_to_tile(x, y);
-        std::vector<Point> valid_directions{};
-        if(is_valid(tile.x_, tile.y_, valid_directions)) {
+    if(board_.xy_on_board(x, y)) {
+        std::pair<int,int> grid_location = board_.xy_to_row_col(x, y);
+        std::cout << "xy_to_row_col:" << std::endl;
+        print_grid_location(grid_location);
+        std::vector<std::pair<int,int>> valid_directions{};
+        if(is_valid(grid_location.first, grid_location.second, valid_directions)) {
+            std::cout << "printing the valid directions for the given mouse press..." << std::endl;
             print_directions(valid_directions);
             // loop through all valid directions and flip existing tile colors
-            flip_tiles(tile.x_, tile.y_, valid_directions);
+            flip_tiles(grid_location.first, grid_location.second, valid_directions);
             return true;
         }
     }
     return false;
 }
 
-bool Player::is_valid(int row, int col, std::vector<Point>& valid_directions) {
+bool Player::is_valid(int row, int col, std::vector<std::pair<int,int>>& valid_directions) {
     if (board_.get_tile(row, col).is_empty()) {
         for (auto direction : kDirections) {
-            Point next_tile{row, col};
-            do {
-                next_tile.x_ += direction.x_;
-                next_tile.y_ += direction.y_;
-            } while(board_.in_bounds(next_tile.x_, next_tile.y_) &&
-                board_.get_tile(next_tile.x_, next_tile.y_).get_color() == opponent_color_);
-
-            if(board_.get_tile(next_tile.x_, next_tile.y_).get_color() == color_) {
+            int flip_count = 0;
+            std::pair<int,int> next_tile{row+direction.first, col+direction.second};
+            std::cout << "visiting..." << std::endl;
+            print_grid_location(next_tile);
+            while(can_flip_tile(next_tile.first, next_tile.second)) {
+                std::cout << "can flip tile..." << std::endl;
+                print_grid_location(next_tile);
+                next_tile.first += direction.first;
+                next_tile.second += direction.second;
+                flip_count++;
+            }
+            if(flip_count > 0 && 
+                board_.get_tile(next_tile.first,next_tile.second).get_color() == color_) {
                 valid_directions.push_back(direction);
             }
         }
@@ -55,13 +66,13 @@ bool Player::is_valid(int row, int col, std::vector<Point>& valid_directions) {
     return !valid_directions.empty();
 }
 
-void Player::flip_tiles(int row, int col, std::vector<Point>& directions) {
+void Player::flip_tiles(int row, int col, std::vector<std::pair<int,int>>& directions) {
     // set current tile to Player color
     board_.get_tile(row, col).set_color(color_);
     
     for(auto direction : directions) {
-        int next_row = row + direction.x_;
-        int next_col = col + direction.y_;
+        int next_row = row + direction.first;
+        int next_col = col + direction.second;
         Tile& next_tile = board_.get_tile(next_row, next_col);
         if (next_tile.get_color() != color_) {
             next_tile.set_color(color_);
@@ -69,3 +80,11 @@ void Player::flip_tiles(int row, int col, std::vector<Point>& directions) {
     }
 }
 
+bool Player::can_flip_tile(int row, int col) {
+    constants::Color color = board_.get_tile(row, col).get_color();
+    bool result = (board_.row_col_on_board(row, col) && color == opponent_color_);
+    std::cout << "On board = " << board_.row_col_on_board(row, col) << std::endl;
+    std::cout << "color == opponents color = " << (color == opponent_color_) << std::endl;
+    std::cout << "Can flip = " << result << std::endl;
+    return result;
+}

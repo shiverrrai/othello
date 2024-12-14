@@ -5,6 +5,7 @@
 #include "utils/constants.h"
 
 #include <vector>
+#include <utility>
 
 class Player {
 public:
@@ -33,13 +34,15 @@ private:
     constants::Color color_;
     constants::Color opponent_color_;
 
-    bool is_valid(int row, int col, std::vector<Point>& valid_directions);
+    bool is_valid(int row, int col, std::vector<std::pair<int, int>>& valid_directions);
 
     /// @brief flips tiles from opponent's color to Player color for all directions
     /// @param row row of current tile
     /// @param col column of current tile
     /// @param directions a collection of direction vectors which need their tiles flipped
-    void flip_tiles(int row, int col, std::vector<Point>& directions);
+    void flip_tiles(int row, int col, std::vector<std::pair<int, int>>& directions);
+
+    bool can_flip_tile(int row, int col);
 
     bool is_active_{false};
 };

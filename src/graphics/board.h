@@ -3,6 +3,8 @@
 
 #include <SDL2/SDL.h>
 #include <array>
+#include <utility>
+
 #include "point.h"
 #include "tile.h"
 #include "utils/constants.h"
@@ -20,27 +22,34 @@ class Board {
 
         void render(SDL_Renderer* renderer);
         
-        static Point index_to_tile(int index);
+        /// @brief convert a 1d index to a (row, col) pair on board
+        /// @param index 1d index
+        /// @return 2d (row, col) location on board
+        static std::pair<int,int> index_to_row_col(int index);
 
-        static int tile_to_index(const Point& tile);
+        /// @brief convert a (row, col) pair on board to a 1d index
+        /// @param row int representing row on board
+        /// @param col int representing col on board
+        /// @return 1d index as an int
+        static int row_col_to_index(int row, int col);
 
         /// @brief given (x,y) in screen frame, compute (row,col) 
-        /// of Tile on board
-        /// @param x x coordinate in screen frame
-        /// @param y y coordinate in screen frame
-        /// @return Point (row, col) of Tile on board
-        Point xy_to_tile(int x, int y);
+        /// location on board
+        /// @param x x location in screen frame
+        /// @param y location in screen frame
+        /// @return (row, col) location on board
+        std::pair<int, int> xy_to_row_col(int x, int y);
 
         /// @brief determines whether an input (x,y) is on board
         /// @param x x-coordinate of input
         /// @param y y-coordinate of input
         /// @return bool depending on whether input (x,y)
         /// is on board
-        bool on_board(int x, int y);
+        bool xy_on_board(int x, int y);
 
         Tile& get_tile(int row, int col);
 
-        bool in_bounds(int row, int col);
+        bool row_col_on_board(int row, int col);
 
     private:
         Point origin_{};
