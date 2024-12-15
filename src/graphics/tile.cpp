@@ -8,8 +8,8 @@ void Tile::initialize(const Point& origin, int length) {
 
 void Tile::render(SDL_Renderer* renderer) {
     SDL_Rect rectangle {
-        origin_.x_,
-        origin_.y_,
+        origin_.x,
+        origin_.y,
         length_,
         length_,
     };
@@ -29,9 +29,13 @@ void Tile::render(SDL_Renderer* renderer) {
         break;
     }
     double radius = 0.6*(length_/2.0);
-    SDL_RenderFillCircle(renderer, origin_.x_ + length_/2.0, origin_.y_ + length_/2.0, radius);
+    SDL_RenderFillCircle(renderer, origin_.x + length_/2.0, origin_.y + length_/2.0, radius);
 }
 
 void Tile::set_color(constants::Color color) {
     color_ = color;
+}
+
+bool Tile::is_empty() {
+    return color_ == constants::Color::NONE;
 }

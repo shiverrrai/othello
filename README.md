@@ -1,1 +1,1 @@
-Checkout https://github.com/TheCherno/ChernoCraft/blob/master/src/graphics/screen.cpp as an example project
+A multi-player rendering of Othello, the popular strategy boardgame. Developed in C++ using modern C++ practices. Uses CMake for builds and SDL2 for graphics rendering and event handling. This repo is still under active development.

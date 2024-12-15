@@ -21,6 +21,8 @@ class Tile {
 
         constants::Color get_color() { return color_; }
 
+        bool is_empty();
+
     private:
         Point origin_{};
 

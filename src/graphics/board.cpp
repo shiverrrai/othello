@@ -7,29 +7,29 @@ void Board::initialize(const Point& origin, int length) {
 }
 
 void Board::initialize_tiles() {
-    int w = length_ / constants::kRows;
-    int h = length_ / constants::kCols;
+    int w = length_ / constants::kCols;
+    int h = length_ / constants::kRows;
 
     for(int i = 0; i < constants::kRows; ++i) {
         for(int j = 0; j < constants::kCols; ++j) {
             int index = i*constants::kCols + j;
             tiles_[index].initialize(
-                Point{origin_.x_ + j*w, origin_.y_ + i*h}, 
+                Point{origin_.x + j*w, origin_.y + i*h}, 
                 length_ / constants::kRows);
         }
     }
 
     // place initial tiles to start game
-    tiles_[tile_to_index(Point{3, 3})].set_color(constants::Color::BLACK);
-    tiles_[tile_to_index(Point{4, 4})].set_color(constants::Color::BLACK);
-    tiles_[tile_to_index(Point{4, 3})].set_color(constants::Color::WHITE);
-    tiles_[tile_to_index(Point{3, 4})].set_color(constants::Color::WHITE);
+    tiles_[row_col_to_index(3, 3)].set_color(constants::Color::BLACK);
+    tiles_[row_col_to_index(4, 4)].set_color(constants::Color::BLACK);
+    tiles_[row_col_to_index(4, 3)].set_color(constants::Color::WHITE);
+    tiles_[row_col_to_index(3, 4)].set_color(constants::Color::WHITE);
 }
 
 void Board::render(SDL_Renderer* renderer) {
     SDL_Rect rectangle {
-        origin_.x_,
-        origin_.y_,
+        origin_.x,
+        origin_.y,
         length_,
         length_,
     };
@@ -41,15 +41,15 @@ void Board::render(SDL_Renderer* renderer) {
     }
 }
 
-bool Board::on_board(int x, int y) {
+bool Board::xy_on_board(int x, int y) {
     // board boundaries
-    Point bottom_right{origin_.x_ + length_, 
-        origin_.y_ + length_ };
+    Point bottom_right{origin_.x + length_, 
+        origin_.y + length_ };
 
-    if (x < origin_.x_ || x > bottom_right.x_) {
+    if (x < origin_.x || x > bottom_right.x) {
         return false;
     }
-    else if (y < origin_.y_ || y > bottom_right.y_) {
+    else if (y < origin_.y || y > bottom_right.y) {
         return false;
     }
     else {
@@ -58,29 +58,31 @@ bool Board::on_board(int x, int y) {
 }
 
 Tile& Board::get_tile(int row, int col) {
-    return tiles_[tile_to_index(Point{row, col})];
+    return tiles_[row_col_to_index(row, col)];
 }
 
-Point Board::index_to_tile(int index) {
-    int x = index % constants::kRows;
-    int y = index / constants::kRows;
-    return Point{x, y};
+std::pair<int,int> Board::index_to_row_col(int index) {
+    int col = index % constants::kRows;
+    int row = index / constants::kRows;
+    return std::make_pair(row, col);
 }
 
-int Board::tile_to_index(const Point& tile) {
-    return (tile.y_ * constants::kCols + tile.x_);
+int Board::row_col_to_index(int row, int col) {
+    return (row * constants::kCols + col);
 }
 
-Point Board::xy_to_tile(int x, int y) {
-    if(!on_board(x, y)) {
+std::pair<int,int> Board::xy_to_row_col(int x, int y) {
+    if(!xy_on_board(x, y)) {
         return {-1, -1};
     }
-    int x_board = x - origin_.x_;
-    int y_board = y - origin_.y_;
-    int tile_width = length_ / constants::kRows;
-    int tile_height = length_ / constants::kCols;
+    int x_board = x - origin_.x;
+    int y_board = y - origin_.y;
+    int tile_width = length_ / constants::kCols;
+    int tile_height = length_ / constants::kRows;
 
-    Point tile{x_board / tile_width, y_board / tile_height};
-    return tile;
+    return std::make_pair(y_board / tile_height, x_board / tile_width);
 }
 
+bool Board::row_col_on_board(int row, int col) {
+    return (row >= 0 && row < constants::kRows && col >= 0 && col < constants::kCols);
+}

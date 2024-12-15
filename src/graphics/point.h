@@ -4,10 +4,13 @@
 struct Point {
     Point() = default;
 
-    Point(int x, int y) :
-        x_(x), y_(y) {}
+    Point(int x, int y)
+    {
+        this->x = x;
+        this->y = y;
+    }
 
-    int x_, y_;
+    int x, y;
 };
 
 #endif // SRC_GRAPHICS_POINT_H

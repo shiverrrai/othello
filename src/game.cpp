@@ -18,12 +18,10 @@ void Game::update() {
     if (input_.get_mouse_press(mouse_press_x, mouse_press_y)) {
         bool result{false};
         if (player1_.is_active()) {
-            std::cout << "Making player 1's turn!" << std::endl;
             result = player1_.make_move(
                 mouse_press_x, mouse_press_y);
         }
         else if (player2_.is_active()) {
-            std::cout << "Making player 2's turn!" << std::endl;
             result = player2_.make_move(
                 mouse_press_x, mouse_press_y);
         }
